@@ -70,6 +70,31 @@ if [ $(id -u) -eq 0 ]; then
         exit 1;
     fi
 
+    # User Generator
+    if [ "$2" ] ; then
+        username="$2";
+    else
+        username="mpi";
+    fi
+
+    if [ "$3" ] ; then
+        password="$3";
+    else
+        password="mpi";
+    fi
+
+    egrep "^$username" /etc/passwd >/dev/null;
+    if [ $? -eq 0 ]; then
+        echo "$username exists!"
+    else
+        pass=$(perl -e 'print crypt($ARGV[0], "password")' $password)
+        useradd -m -p $pass $username
+        [ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
+        usermod -aG $username $password;
+        echo "User $username created successfully";
+        echo "";
+    fi
+
     echo "";
     echo "################################################";
     echo "##             OpenMPI Configuration          ##";
@@ -86,40 +111,43 @@ if [ $(id -u) -eq 0 ]; then
     prefix=$(ipcalc -p "$subnet" | cut -f2 -d= );
     hostname=$(echo "$HOSTNAME");
 
-    echo "";
-    echo "################################################";
-    echo "##             Authorization                  ##";
-    echo "################################################";
-    echo "";
-
-    echo "Setting up cluster authorization";
-    echo "";
-
-    username=$(whoami);
-    if [[ -f "/home/$username/.ssh/id_rsa" && -f "/home/$username/.ssh/id_rsa.pub" ]]; then
-        echo "SSH already setup";
-        echo "";
+    if [ "$1" ] ; then
+        echo "Skipping Generate SSH Key";
     else
-        echo "SSH setup";
         echo "";
-        sudo -H -u $username bash -c 'ssh-keygen';
-        echo "Generate SSH Success";
-    fi
+        echo "################################################";
+        echo "##             Authorization                  ##";
+        echo "################################################";
+        echo "";
 
-    if [ -e "/home/$username/.ssh/authorized_keys" ] ; then
-        echo "Authorization already setup";
+        echo "Setting up cluster authorization";
         echo "";
-    else
-        echo "Configuration authentication";
-        echo "";
-        sudo -H -u $username bash -c 'touch /home/'$username'/.ssh/authorized_keys';
-        echo "Authentication Compelete";
-        echo "";
+
+        if [[ -f "/home/$username/.ssh/id_rsa" && -f "/home/$username/.ssh/id_rsa.pub" ]]; then
+            echo "SSH already setup";
+            echo "";
+        else
+            echo "SSH setup";
+            echo "";
+            sudo -H -u $username bash -c 'ssh-keygen';
+            echo "Generate SSH Success";
+        fi
+
+        if [ -e "/home/$username/.ssh/authorized_keys" ] ; then
+            echo "Authorization already setup";
+            echo "";
+        else
+            echo "Configuration authentication";
+            echo "";
+            sudo -H -u $username bash -c 'touch /home/'$username'/.ssh/authorized_keys';
+            echo "Authentication Compelete";
+            echo "";
+        fi
+        
+        sudo -H -u $username bash -c 'cat /home/'$username'/.ssh/id_rsa.pub >> /home/'$username'/.ssh/authorized_keys';
+        chown -R $username:$username "/home/$username/.ssh/";
+        sudo -H -u $username bash -c 'chmod 600 /home/'$username'/.ssh/authorized_keys';
     fi
-    
-    sudo -H -u $username bash -c 'cat /home/'$username'/.ssh/id_rsa.pub >> /home/'$username'/.ssh/authorized_keys';
-    chown -R $username:$username "/home/$username/.ssh/";
-    sudo -H -u $username bash -c 'chmod 600 /home/'$username'/.ssh/authorized_keys';
 
     # Firewall
     echo "################################################";
@@ -150,7 +178,6 @@ if [ $(id -u) -eq 0 ]; then
 
     echo "";
     
-
     echo "Initialize Complete";
 
     echo "";

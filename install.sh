@@ -75,6 +75,54 @@ if [ $(id -u) -eq 0 ]; then
         exit 1;
     fi
 
+    # User Generator
+    read -p "Do you want to create user for spark administrator? (y/N) [ENTER] (y) " createuser;
+    createuser=$(printf '%s\n' "$createuser" | LC_ALL=C tr '[:upper:]' '[:lower:]' | sed 's/"//g');
+
+    if [ -n createuser ] ; then
+        if [ "$createuser" == "y" ] ; then
+            read -p "Enter username : " username;
+            read -s -p "Enter password : " password;
+            egrep "^$username" /etc/passwd >/dev/null;
+            if [ $? -eq 0 ]; then
+                echo "$username exists!"
+            else
+                pass=$(perl -e 'print crypt($ARGV[0], "password")' $password)
+                useradd -m -p $pass $username
+                [ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
+            fi
+            usermod -aG $username $password;
+        else
+            read -p "Do you want to use exisiting user for spark administrator? (y/N) [ENTER] (y) " existinguser;
+            if [ "$existinguser" == "y" ] ; then
+                read -p "Enter username : " username;
+                egrep "^$username" /etc/passwd >/dev/null;
+                if [ $? -eq 0 ]; then
+                    echo "$username | OK" ;
+                else
+                    echo "Username isn't exist we use root instead";
+                    username=$(whoami);
+                fi 
+            else 
+                username=$(whoami);
+            fi
+        fi
+    else
+        read -p "Enter username : " username;
+        read -s -p "Enter password : " password;
+        egrep "^$username" /etc/passwd >/dev/null;
+        if [ $? -eq 0 ]; then
+            echo "$username exists!"
+        else
+            pass=$(perl -e 'print crypt($ARGV[0], "password")' $password)
+            useradd -m -p $pass $username
+            [ $? -eq 0 ] && echo "User has been added to system!" || echo "Failed to add a user!"
+            usermod -aG $username $password;
+            echo "User $username created successfully";
+            echo "";
+        fi
+    fi
+
     echo "";
     echo "################################################";
     echo "##             OpenMPI Configuration          ##";
@@ -104,7 +152,6 @@ if [ $(id -u) -eq 0 ]; then
     echo "Setting up cluster authorization";
     echo "";
 
-    username=$(whoami);
 
     if [[ -f "/home/$username/.ssh/id_rsa" && -f "/home/$username/.ssh/id_rsa.pub" ]]; then
         echo "SSH already setup";
@@ -163,12 +210,13 @@ if [ $(id -u) -eq 0 ]; then
 
         read -p "Do you want to setup worker? (y/N) [ENTER] (n) " workeraccept;
         workeraccept=$(printf '%s\n' "$workeraccept" | LC_ALL=C tr '[:upper:]' '[:lower:]' | sed 's/"//g');
-
+        workers=();
+        workers[0]=$master;
         if [ -n "$workeraccept" ] ; then 
             if [ "$workeraccept" == "y" ] ; then 
                 while [ "$workeraccept" == "y" ] ; do 
                     read -p "Please enter worker IP Address [ENTER] " worker;
-                    echo -e  ''$worker' worker'$host' # Worker' >> /etc/hosts;
+                    workers[$host]=$worker;
                     if [[ -f "~/.ssh/id_rsa" && -f "~/.ssh/id_rsa.pub" ]]; then 
                         echo "SSH already setup";
                         echo "";
@@ -192,17 +240,27 @@ if [ $(id -u) -eq 0 ]; then
                     ssh-copy-id -i ~/.ssh/id_rsa.pub "$username@$ipaddr"
                     ssh-copy-id -i ~/.ssh/id_rsa.pub "$worker"
 
+                    # Installation On Worker Machine
                     ssh $worker "wget https://raw.githubusercontent.com/bayudwiyansatria/OpenMPI-Environment/master/express-install.sh -O /tmp/express-install.sh";
                     ssh $worker "chmod 777 /tmp/express-install.sh";
-                    ssh $worker "./tmp/express-install.sh" "$ipaddr";
+                    ssh $worker "./tmp/express-install.sh" "$ipaddr" "$username" "$password";
+
+                    # Send Authorization Key To Worker Machine
                     scp /home/$username/.ssh/authorized_keys /home/$username/.ssh/id_rsa /home/$username/.ssh/id_rsa.pub $username@$worker:/home/$username/.ssh/
                     ssh $worker "chown -R $username:$username /home/$username/.ssh/";
-                    ssh $worker "echo -e  ''$ipaddr' # Master' >> /etc/hosts";
+
+                    # New Worker
                     read -p "Do you want to add more worker? (y/N) [ENTER] (n) " workeraccept;
                     workeraccept=$(printf '%s\n' "$workeraccept" | LC_ALL=C tr '[:upper:]' '[:lower:]' | sed 's/"//g'); 
                 done
             fi
         fi
+
+        for worker in "${workers[@]}" ; do 
+            echo -e  ''$worker' worker'$host' # Worker' >> /etc/hosts;
+            ssh $worker "echo -e $worker worker'$host' # Worker'$host' >> /etc/hosts";
+            host=$(( $host + 1 ));
+        done
 
         echo "Worker added";
     fi
@@ -230,7 +288,7 @@ if [ $(id -u) -eq 0 ]; then
     echo "";
 
     echo "User $username";
-    echo "";
+    echo "Password $password";
 
     echo "Author    : Bayu Dwiyan Satria";
     echo "Email     : bayudwiyansatria@gmail.com";
