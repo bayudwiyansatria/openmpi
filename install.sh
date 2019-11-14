@@ -68,9 +68,9 @@ if [ $(id -u) -eq 0 ]; then
 
     # Required Packages
     if [ "$os" == "ubuntu" ] || [ "$os" == "debian" ] ; then
-        apt-get -y install openmpi-bin 
+        apt-get -y install openmpi-bin nfs-kernel-server nfs-common
     elif [ "$os" == "centos" ] || [ "$os" == "rhel" ] || [ "$os" == "fedora" ]; then
-        yum -y install openmpi
+        yum -y install openmpi nfs-kernel-server nfs-common
     else
         exit 1;
     fi
@@ -142,6 +142,15 @@ if [ $(id -u) -eq 0 ]; then
     host=1;
     echo -e  ''$master' master # Master' >> /etc/hosts;
 
+    # Setup Sharing Directory
+    mkdir -p /home/$username/share;
+    echo -e "/home/$username/share *(rw,sync,no_root_squash,no_subtree_check)" >> /etc/exports;
+
+    exportfs -a;
+    service nfs-kernel-server restart;
+
+    # Permanent Setup NFS
+    echo -e "$master:/home/$username/share /home/$username/share nfs" >> /etc/fstab;
 
     echo "";
     echo "################################################";
