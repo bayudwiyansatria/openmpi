@@ -192,9 +192,9 @@ if [ $(id -u) -eq 0 ]; then
                     ssh-copy-id -i ~/.ssh/id_rsa.pub "$username@$ipaddr"
                     ssh-copy-id -i ~/.ssh/id_rsa.pub "$worker"
 
-                    ssh $worker "wget https://raw.githubusercontent.com/bayudwiyansatria/OpenMPI-Environment/master/express-install.sh";
-                    ssh $worker "chmod 777 express-install.sh";
-                    ssh $worker "./express-install.sh" "$ipaddr";
+                    ssh $worker "wget https://raw.githubusercontent.com/bayudwiyansatria/OpenMPI-Environment/master/express-install.sh -O /tmp/express-install.sh";
+                    ssh $worker "chmod 777 /tmp/express-install.sh";
+                    ssh $worker "./tmp/express-install.sh" "$ipaddr";
                     scp /home/$username/.ssh/authorized_keys /home/$username/.ssh/id_rsa /home/$username/.ssh/id_rsa.pub $username@$worker:/home/$username/.ssh/
                     ssh $worker "chown -R $username:$username /home/$username/.ssh/";
                     ssh $worker "echo -e  ''$ipaddr' # Master' >> /etc/hosts";
@@ -216,6 +216,7 @@ if [ $(id -u) -eq 0 ]; then
     echo "Cleaning Installation Packages";
 
     history -c && history -w
+    rm -rf /tmp/install.sh
 
     echo "Success Installation Packages";
 

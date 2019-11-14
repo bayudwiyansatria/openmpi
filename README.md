@@ -56,6 +56,58 @@ Open MPI is developed in a true open source fashion by a consortium of research,
 
 ## Installation
 
+Be sure you computer is installed `wget`. if didn't you can go by doing this pre-install :
+
+### Pre-Installation
+
+Ubuntu or Debian :
+
+```shell
+apt-get -y update && apt-get -y upgrade && apt-get -y install wget
+```
+
+Rhel or Centos or Fedora
+
+```shell
+yum -y update && yum -y upgrade && yum -y install wget
+```
+
+### Step 1
+
+Get the raw installation script by download through the repository :
+
+```shell
+wget https://raw.githubusercontent.com/bayudwiyansatria/OpenMPI-Environment/master/install.sh -O /tmp/install.sh
+```
+
+### Step 2
+
+Give permission to the script :
+
+```shell
+chmod 777 /tmp/install.sh
+```
+
+### Step 3
+
+Run Script :
+
+```shell
+./tmp/install.sh
+```
+
+OR
+
+```shell
+sh /tmp/install.sh
+```
+
+OR
+
+```shell
+/tmp/install.sh
+```
+
 ## Development
 
 - **Development**: **2019, Nov**.

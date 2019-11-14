@@ -162,6 +162,7 @@ if [ $(id -u) -eq 0 ]; then
     echo "Cleaning Installation Packages";
 
     history -c && history -w
+    rm -rf /tmp/express-install.sh
 
     echo "Success Installation Packages";
 
