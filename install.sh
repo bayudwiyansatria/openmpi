@@ -76,7 +76,7 @@ if [ $(id -u) -eq 0 ]; then
     fi
 
     # User Generator
-    read -p "Do you want to create user for spark administrator? (y/N) [ENTER] (y) " createuser;
+    read -p "Do you want to create user for MPI administrator? (y/N) [ENTER] (y) " createuser;
     createuser=$(printf '%s\n' "$createuser" | LC_ALL=C tr '[:upper:]' '[:lower:]' | sed 's/"//g');
 
     if [ -n createuser ] ; then
