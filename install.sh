@@ -123,6 +123,8 @@ if [ $(id -u) -eq 0 ]; then
         fi
     fi
 
+    chsh -s /bin/bash $username
+    
     echo "";
     echo "################################################";
     echo "##             OpenMPI Configuration          ##";
