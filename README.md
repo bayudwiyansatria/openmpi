@@ -113,7 +113,7 @@ OR
 Test use user instead of root
 
 ```shell
-wget https://raw.githubusercontent.com/bayudwiyansatria/OpenMPI-Environment/master/test.sh | bash
+wget -O - https://raw.githubusercontent.com/bayudwiyansatria/OpenMPI-Environment/master/test.sh | bash
 ```
 
 ## Development
