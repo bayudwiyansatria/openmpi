@@ -93,7 +93,7 @@ if [ $(id -u) -eq 0 ]; then
             fi
             usermod -aG $username $password;
         else
-            read -p "Do you want to use exisiting user for spark administrator? (y/N) [ENTER] (y) " existinguser;
+            read -p "Do you want to use exisiting user for MPI administrator? (y/N) [ENTER] (y) " existinguser;
             if [ "$existinguser" == "y" ] ; then
                 read -p "Enter username : " username;
                 egrep "^$username" /etc/passwd >/dev/null;
