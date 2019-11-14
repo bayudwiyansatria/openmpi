@@ -63,9 +63,9 @@ if [ $(id -u) -eq 0 ]; then
 
     # Required Packages
     if [ "$os" == "ubuntu" ] || [ "$os" == "debian" ] ; then
-        apt-get -y install openmpi-bin nfs-kernel-server nfs-common
+        apt-get -y install openmpi-bin nfs-kernel-server nfs-common htop
     elif [ "$os" == "centos" ] || [ "$os" == "rhel" ] || [ "$os" == "fedora" ]; then
-        yum -y install openmpi nfs-kernel-server nfs-common
+        yum -y install openmpi nfs-kernel-server nfs-common htop
     else
         exit 1;
     fi
