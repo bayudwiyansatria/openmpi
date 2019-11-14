@@ -108,6 +108,14 @@ OR
 /tmp/install.sh
 ```
 
+### Step 4
+
+Test use user instead of root
+
+```shell
+wget https://raw.githubusercontent.com/bayudwiyansatria/OpenMPI-Environment/master/test.sh | bash
+```
+
 ## Development
 
 - **Development**: **2019, Nov**.
