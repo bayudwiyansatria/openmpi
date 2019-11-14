@@ -154,10 +154,10 @@ if [ $(id -u) -eq 0 ]; then
 
 
     if [[ -f "/home/$username/.ssh/id_rsa" && -f "/home/$username/.ssh/id_rsa.pub" ]]; then
-        echo "SSH already setup";
+        echo "SSH already setup for $username";
         echo "";
     else
-        echo "SSH setup";
+        echo "SSH setup for $username";
         echo "";
         sudo -H -u $username bash -c 'ssh-keygen';
         echo "Generate SSH Success";
@@ -167,7 +167,7 @@ if [ $(id -u) -eq 0 ]; then
         echo "Authorization already setup";
         echo "";
     else
-        echo "Configuration authentication";
+        echo "Configuration authentication for $username";
         echo "";
         sudo -H -u $username bash -c 'touch /home/'$username'/.ssh/authorized_keys';
         echo "Authentication Compelete";
@@ -237,7 +237,11 @@ if [ $(id -u) -eq 0 ]; then
                         echo "Authentication Compelete";
                         echo "";
                     fi
+                    
+                    echo "Authenticate setup for $username@$ipaddr";
                     ssh-copy-id -i ~/.ssh/id_rsa.pub "$username@$ipaddr"
+                    
+                    echo "Authenticate setup for $worker";
                     ssh-copy-id -i ~/.ssh/id_rsa.pub "$worker"
 
                     # Installation On Worker Machine

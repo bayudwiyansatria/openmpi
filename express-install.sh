@@ -122,23 +122,23 @@ if [ $(id -u) -eq 0 ]; then
     echo "";
 
     if [[ -f "/home/$username/.ssh/id_rsa" && -f "/home/$username/.ssh/id_rsa.pub" ]]; then
-        echo "SSH already setup";
+        echo "SSH already setup for $username";
         echo "";
     else
         echo "SSH setup";
         echo "";
         sudo -H -u $username bash -c 'ssh-keygen';
-        echo "Generate SSH Success";
+        echo "Generate SSH Success for $username";
     fi
 
     if [ -e "/home/$username/.ssh/authorized_keys" ] ; then
-        echo "Authorization already setup";
+        echo "Authorization already setup for $username";
         echo "";
     else
-        echo "Configuration authentication";
+        echo "Configuration authentication for $username";
         echo "";
         sudo -H -u $username bash -c 'touch /home/'$username'/.ssh/authorized_keys';
-        echo "Authentication Compelete";
+        echo "Authentication Compelete for $username";
         echo "";
     fi
     
