@@ -203,7 +203,7 @@ if [ $(id -u) -eq 0 ]; then
     echo "";
 
     echo "User $username";
-    echo "";
+    echo "User $password";
 
     echo "Author    : Bayu Dwiyan Satria";
     echo "Email     : bayudwiyansatria@gmail.com";
