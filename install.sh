@@ -218,29 +218,29 @@ if [ $(id -u) -eq 0 ]; then
                     read -p "Please enter worker IP Address [ENTER] " worker;
                     workers[$host]=$worker;
                     if [[ -f "~/.ssh/id_rsa" && -f "~/.ssh/id_rsa.pub" ]]; then 
-                        echo "SSH already setup";
+                        echo "SSH already setup for root@$ipaddr";
                         echo "";
                     else
-                        echo "SSH setup";
+                        echo "SSH setup for root@$ipaddr";
                         echo "";
                         ssh-keygen;
                         echo "Generate SSH Success";
                     fi
 
                     if [ -e "~/.ssh/authorized_keys" ] ; then 
-                        echo "Authorization already setup";
+                        echo "Authorization already setup for root@$ipaddr";
                         echo "";
                     else
-                        echo "Configuration authentication";
+                        echo "Configuration authentication for root@$ipaddr";
                         echo "";
                         touch ~/.ssh/authorized_keys;
-                        echo "Authentication Compelete";
+                        echo "Authentication Compelete for root@$ipaddr";
                         echo "";
                     fi
                     
                     echo "Authenticate setup for $username@$ipaddr";
                     ssh-copy-id -i ~/.ssh/id_rsa.pub "$username@$ipaddr"
-                    
+
                     echo "Authenticate setup for $worker";
                     ssh-copy-id -i ~/.ssh/id_rsa.pub "$worker"
 
