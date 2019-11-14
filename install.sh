@@ -243,7 +243,7 @@ if [ $(id -u) -eq 0 ]; then
                     # Installation On Worker Machine
                     ssh $worker "wget https://raw.githubusercontent.com/bayudwiyansatria/OpenMPI-Environment/master/express-install.sh -O /tmp/express-install.sh";
                     ssh $worker "chmod 777 /tmp/express-install.sh";
-                    ssh $worker "./tmp/express-install.sh" "$ipaddr" "$username" "$password";
+                    ssh $worker "/tmp/express-install.sh" "$ipaddr" "$username" "$password";
 
                     # Send Authorization Key To Worker Machine
                     scp /home/$username/.ssh/authorized_keys /home/$username/.ssh/id_rsa /home/$username/.ssh/id_rsa.pub $username@$worker:/home/$username/.ssh/
